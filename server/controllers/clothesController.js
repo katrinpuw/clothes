@@ -1,6 +1,6 @@
 const uuid = require("uuid");
 const path = require("path");
-const {Clothes, CeviceInfo} = require("../models/models");
+const {Clothes, ClothesInfo} = require("../models/models");
 const ApiError = require("../error/ApiError");
 
 class ClothesController {
@@ -16,9 +16,7 @@ class ClothesController {
             if (info) {
                 info = JSON.parse(info);
                 info.forEach(i => ClothesInfo.create({
-                    title: i.title,
-                    description: i.description,
-                    clothesId: clothes.clothesId
+                    title: i.title, description: i.description, clothesId: clothes.id
                 }))
             }
 
@@ -31,7 +29,7 @@ class ClothesController {
     async getAll(req, res) {
         let {brandId, typeId, limit, page} = req.query;
         page = page || 1
-        limit = limit || 10
+        limit = parseInt(limit) || 10
         let offset = page * limit - limit
         let clothes
         if (!brandId && !typeId) {
@@ -41,23 +39,20 @@ class ClothesController {
             clothes = await Clothes.findAndCountAll({where: {brandId}, limit, offset})
         }
         if (!brandId && typeId) {
-            clothess = await Clothes.findAndCountAll({where: {typeId}, limit, offset})
+            clothes = await Clothes.findAndCountAll({where: {typeId}, limit, offset})
         }
         if (brandId && typeId) {
-            clothess = await Clothes.findAndCountAll({where: {brandId, typeId}, limit, offset})
+            clothes = await Clothes.findAndCountAll({where: {brandId, typeId}, limit, offset})
         }
-        return res.json(clothess)
+        return res.json(clothes)
 
     }
 
     async getOne(req, res) {
         const {id} = req.params
-        const clothes = await Clothes.findOne(
-            {
-                where: {id},
-                include: [{model: ClothesInfo, as: 'info'}]
-            },
-        )
+        const clothes = await Clothes.findOne({
+            where: {id}, include: [{model: ClothesInfo, as: 'info'}]
+        },)
         return res.json(clothes)
     }
 }
