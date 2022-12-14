@@ -16,7 +16,8 @@ class ClothesController {
             if (info) {
                 info = JSON.parse(info);
                 info.forEach(i => ClothesInfo.create({
-                    title: i.title, description: i.description, clothesId: clothes.id
+                    //SQL feature/bug clothes == clothe, this is the reason why clotheId: clothes.id
+                    title: i.title, description: i.description, clotheId: clothes.id
                 }))
             }
 
